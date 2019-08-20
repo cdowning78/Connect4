@@ -1,3 +1,17 @@
-// hello
+import java.util.Scanner;
 
-// oops
+
+
+public class Driver {
+	
+	public static void main(String[] args) {
+		Scanner keyb = new Scanner(System.in);
+				
+		// stuff
+		
+		
+		
+	}
+	
+	
+}
