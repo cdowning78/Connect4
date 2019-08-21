@@ -115,7 +115,7 @@ public class Board {
 
 	private boolean isValidMove(int row) {
 		
-		if(row > WIDTH - 1) {
+		if(row > WIDTH - 1 || row < 0) {
 			return false; // out of bounds
 		}
 		return workingBoard[row] < HEIGHT;
