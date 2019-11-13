@@ -10,13 +10,14 @@ public class Board {
 	// if INT: 1 for X, zero for empty, -1 for O
 	private Character turn;
 	
-
+	
 	private boolean vsCPU = false;
 	
 	// tracks most recent move (zero-based column)
 	private int lastMove;
+	private int lastMoveRow;
 	
-	// holds height of available move, == HEIGHT is full column
+	// holds height of available move, if [== HEIGHT] it's full column
 	private int[] workingBoard; 
 	
 	public Board() {
@@ -26,7 +27,7 @@ public class Board {
 		turn = STARTING_PLAYER;
 		workingBoard = new int[WIDTH];
 		
-		lastMove = -1;
+		lastMove = -1; lastMoveRow = -1;
 	}
 	
 	private void createEmptyBoard() {
@@ -37,12 +38,26 @@ public class Board {
 		}	
 	}
 
+	
+	/*
+	 * I don't want to check the whole board, but only the combinations
+	 * that would be impacted by the most recent move.
+	 */
+	
+	// Do i want to manually change whose turn it is in the driver, 
+	// so that i can checkWin using the turn variable
+	
 	public boolean isOver() {
 		if(lastMove == -1) {
 			return false;
 		}
 		
-		return checkVertical() || checkHorizontal() 
+		lastMoveRow = workingBoard[lastMove] - 1;
+		System.out.println("inside isOver()\n"
+				+ "col=" + (lastMove) + "row=" + lastMoveRow);
+		
+		return checkVertical() 
+				/*|| checkHorizontal() */
 				/*|| checkR_Diag() || checkL_Diag() */
 				|| boardIsFull();
 	}
@@ -53,14 +68,20 @@ public class Board {
 				return false;
 			}
 		}
-		turn = null;
+		turn = null; // what is this for?
 		return true;
 	}
 
 	// FIXME
+	/*
+	 * Most recent piece is equal to [NUM_IN_ROW - 1] pieces below it
+	 */
 	private boolean checkVertical() {
-		int lastMoveRow = workingBoard[lastMove] - 1;
-		System.out.println("lastMoveRow: " + lastMoveRow);
+		// when i enter this function, lastMove is the column just modified (1-based index)
+		// swapTurn() has been called since the last move
+		
+		// I'm going to move this into field data
+		//int lastMoveRow = workingBoard[lastMove] - 1;
 		
 		if(lastMoveRow < NUM_IN_ROW - 1) {
 			// not enough pieces in column
@@ -73,12 +94,27 @@ public class Board {
 				return false;
 			}
 		}
-		
+		System.out.println("vert win.");
 		return true;
 	}
 
 	private boolean checkHorizontal() {
-		return false;
+		// Least amount of checks? -> shifting.
+		// check NUM_IN_ROW from lastCol - (NUM_IN_ROW - 1) to 
+								//		 lastCol + (NUM_IN_ROW - 1)
+		// This is to not run off the side of the board
+		int start = Math.max(0, lastMove - (NUM_IN_ROW - 1));
+		int end = Math.min(WIDTH - 1, lastMove + (NUM_IN_ROW - 1));
+		
+		for(int i = start; i <= end; i++) {
+			if(board[lastMoveRow][i] == turn || board[lastMoveRow][i] == ' ') {
+				// keep going
+			}
+		}
+		
+		
+		
+		return true;
 	}
 
 	private boolean checkR_Diag() {
@@ -95,8 +131,8 @@ public class Board {
 	}
 
 	/**
-	 * Receives a row for a new piece to be put in to (1-WIDTH)
-	 * Immediately switches to 0-(WIDTH-1) for processing
+	 * Receives a row for a new piece to be put in to (input between 1, WIDTH)
+	 * Immediately switches to 0 to [WIDTH-1] for processing
 	 */
 	public boolean makeMove(int move) {
 		move--; // change move to zero-based indexing

@@ -8,7 +8,7 @@ public class Driver {
 		Board game = new Board();
 		// stuff
 		
-		int move;
+		int move; // holds input for a move
 		
 		welcome();
 		
