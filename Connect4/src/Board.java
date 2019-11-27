@@ -56,8 +56,8 @@ public class Board {
 		System.out.println("inside isOver()\n"
 				+ "col=" + (lastMove) + "row=" + lastMoveRow);
 		
-		return checkVertical() 
-				/*|| checkHorizontal() */
+		return /*checkVertical() 
+				|| */checkHorizontal()
 				/*|| checkR_Diag() || checkL_Diag() */
 				|| boardIsFull();
 	}
@@ -68,33 +68,29 @@ public class Board {
 				return false;
 			}
 		}
-		turn = null; // what is this for?
+		turn = null; // what is this for? I think it's for printing that there has been a tie.
 		return true;
 	}
 
-	// FIXME
 	/*
+	 * Checks for a vertical win condition. Only checks column containing the
+	 * most recent move.
+	 * This is easy because you just check down the column for equality.
 	 * Most recent piece is equal to [NUM_IN_ROW - 1] pieces below it
 	 */
 	private boolean checkVertical() {
-		// when i enter this function, lastMove is the column just modified (1-based index)
-		// swapTurn() has been called since the last move
-		
-		// I'm going to move this into field data
-		//int lastMoveRow = workingBoard[lastMove] - 1;
-		
 		if(lastMoveRow < NUM_IN_ROW - 1) {
 			// not enough pieces in column
-			System.out.println("Not enough pieces to win vertically.");
+			// System.out.println("Not enough pieces to win vertically.");
 			return false;
 		}
 		for(int i = 0; i < NUM_IN_ROW; i++) {
 			if(board[lastMoveRow - i][lastMove] == turn) {
-				System.out.println("space on board: " + board[lastMoveRow - i][lastMove]);
+				// System.out.println("space on board: " + board[lastMoveRow - i][lastMove]);
 				return false;
 			}
 		}
-		System.out.println("vert win.");
+		// System.out.println("vert win.");
 		return true;
 	}
 
@@ -102,22 +98,51 @@ public class Board {
 		// Least amount of checks? -> shifting.
 		// check NUM_IN_ROW from lastCol - (NUM_IN_ROW - 1) to 
 								//		 lastCol + (NUM_IN_ROW - 1)
-		// This is to not run off the side of the board
-		int start = Math.max(0, lastMove - (NUM_IN_ROW - 1));
-		int end = Math.min(WIDTH - 1, lastMove + (NUM_IN_ROW - 1));
 		
-		for(int i = start; i <= end; i++) {
-			if(board[lastMoveRow][i] == turn || board[lastMoveRow][i] == ' ') {
-				// keep going
-			}
+		char last = board[lastMoveRow][lastMove];
+		
+		// This is to not run off the side of the board
+		// ---
+		int start = Math.max(0, lastMove - (NUM_IN_ROW - 1));
+		// either 0, or 3 to the left of last move
+		
+		int end = Math.min(WIDTH - 1, lastMove + (NUM_IN_ROW - 1));
+		// either 6, or 3 to the right of last move
+
+		if((end-start) < NUM_IN_ROW) {
+			// board is too narrow to win horizontally
+			return false;
 		}
 		
+		System.out.println("start: " + start + ", end: " + end);
 		
+		int consecPieces = 0;
+		for(int i = start; i <= end; i++) {
+			
+			if(board[lastMoveRow][i] == last) {
+				consecPieces++;
+			} else {
+				consecPieces = 0;
+				if(i > lastMove) {
+					// not enough pieces left, so stop checking.
+					return false;
+				}
+			}
+			System.out.println("CP: " + consecPieces + ", i = " + i);
+			if(consecPieces == NUM_IN_ROW) {
+				return true;
+			}	
+		}
 		
-		return true;
+		return false;
 	}
 
+	/**
+	 * A right diagonal is one that goes bottom-left to top-right
+	 * @return
+	 */
 	private boolean checkR_Diag() {
+		
 		return false;
 	}
 
@@ -196,6 +221,5 @@ public class Board {
 		//makeMove(col);
 		
 	}
-	
 	
 }
