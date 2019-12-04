@@ -1,6 +1,5 @@
 # Connect4
-GUI, simple scoring algorithm, 
+Make a two-player console game, then add: GUI, CPU player (dumb player), scoring system, smarter CPU player.
 
-Before Starting:
-Starting off with the goal of alpha-beta pruning for the scoring, and delegating as many tasks as possible to different classes.
-
+Before the Project:
+Starting off with the goal of alpha-beta pruning for the scoring, and making the whole thing easy to follow.
