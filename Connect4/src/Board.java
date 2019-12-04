@@ -113,7 +113,7 @@ public class Board {
 			return false;
 		}
 		
-		// ok.
+		// ok. 
 		
 		System.out.println("start: " + start + "\nend: " + end);
 		
