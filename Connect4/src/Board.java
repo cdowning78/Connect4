@@ -10,8 +10,7 @@ public class Board {
 	// if INT: 1 for X, zero for empty, -1 for O
 	private Character turn;
 	
-	
-	private boolean vsCPU = false;
+	private boolean vsCPU = true;
 	
 	// tracks most recent move (zero-based column)
 	private int lastMoveCol;
@@ -53,9 +52,6 @@ public class Board {
 		}
 		
 		lastMoveRow = workingBoard[lastMoveCol] - 1;
-		System.out.println("inside isOver()\n"
-				+ "col = " + (lastMoveCol) + "row = " + lastMoveRow + 
-				"turn = " + turn);
 		
 		return checkVertical() 
 				|| checkHorizontal() 
@@ -82,97 +78,54 @@ public class Board {
 	private boolean checkVertical() {
 		if(lastMoveRow < NUM_IN_ROW - 1) {
 			// not enough pieces in column
-			// System.out.println("Not enough pieces to win vertically.");
 			return false;
 		}
 		for(int i = 0; i < NUM_IN_ROW; i++) {
 			if(board[lastMoveRow - i][lastMoveCol] != turn) {
-				// System.out.println("space on board: " + board[lastMoveRow - i][lastMove]);
 				return false;
 			}
 		}
-		// System.out.println("vert win.");
 		return true;
 	}
 
 	private boolean checkHorizontal() {
-		// Least amount of checks? -> shifting.
-		// check NUM_IN_ROW from lastCol - (NUM_IN_ROW - 1) to 
-								//		 lastCol + (NUM_IN_ROW - 1)
-		
-		// This is to not run off the side of the board
-		// ---
-		int start = Math.max(0, lastMoveCol - (NUM_IN_ROW - 1));
-		// either 0, or 3 to the left of last move
-		
-		int end = Math.min(WIDTH - 1, lastMoveCol + (NUM_IN_ROW - 1));
-		// either 6, or 3 to the right of last move
+		// Least amount of checks? -> check outward from most recent move
 
-		if((end-start) < NUM_IN_ROW) {
-			// board is too narrow to win horizontally
-			return false;
-		}
-		
-		// ok. 
-		
-		System.out.println("start: " + start + "\nend: " + end);
-		
-		// ok this works. I want to be better.
-		// Start from lastMoveCol, move out. Winning combo must contain center by def.
-		int consecPieces = 0;
-		/*
-		for(int i = start; i <= end; i++) {
-			
-			if(board[lastMoveRow][i] == turn) {
-				consecPieces++;
-			} else {
-				consecPieces = 0;
-				if(i > lastMoveCol) {
-					// not enough pieces left, so stop checking.
-					return false;
-				}
-			}
-			System.out.println("CP: " + consecPieces + ", i = " + i);
-			if(consecPieces == NUM_IN_ROW) {
-				return true;
-			}	
-		}
-		*/
+		// This is to not run off the side of the board
+		int start = Math.max(0, lastMoveCol - (NUM_IN_ROW - 1));		
+		int end = Math.min(WIDTH - 1, lastMoveCol + (NUM_IN_ROW - 1));
+				
+		// Start from lastMoveCol, move out. Winning combo must contain center
+		int consecPieces = 1;
 		
 		// go left
-		consecPieces = 1;
 		for(int i = lastMoveCol - 1; i >= start; i--) {
-			
 			if(board[lastMoveRow][i] == turn) {
 				consecPieces++;
 			} else {
-				System.out.println("break.");
 				break;
-			}
-			System.out.println("Not broken\nCP: " + consecPieces + ", i = " + i);
-			if(consecPieces == NUM_IN_ROW) {
-				return true;
 			}
 		}
 		
-		System.out.println("going left did not yield a win, going right");
+		// a win occurred from the last move directly left
+		if(consecPieces == NUM_IN_ROW) {
+			return true;
+		}
 		
+		// System.out.println("going left did not yield a win.");
 		// go right
 		for(int i = lastMoveCol + 1; i <= end; i++) {
-			
 			if(board[lastMoveRow][i] == turn) {
 				consecPieces++;
 			} else {
 				// return here because resetting at this point cannot yield a win
-				System.out.println("going right also did not yeild a horizontal win.");
+				// System.out.println("going right also did not yield a horizontal win.");
 				return false;
 			}
-			System.out.println("Not broken\nCP: " + consecPieces + ", i = " + i);
 			if(consecPieces == NUM_IN_ROW) {
 				return true;
 			}
 		}
-		
 		
 		// I think this return is unreachable, 
 		// but deleting it results in compiler error
