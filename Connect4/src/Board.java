@@ -55,7 +55,7 @@ public class Board {
 		
 		return checkVertical() 
 				|| checkHorizontal() 
-				/*||  checkR_Diag() || checkL_Diag() */
+				|| checkR_Diag() /*|| checkL_Diag() */
 				|| boardIsFull();
 	}
 	
@@ -95,6 +95,11 @@ public class Board {
 		int start = Math.max(0, lastMoveCol - (NUM_IN_ROW - 1));		
 		int end = Math.min(WIDTH - 1, lastMoveCol + (NUM_IN_ROW - 1));
 				
+		if((end - start) < (NUM_IN_ROW - 1)) {
+			return false;
+			// board too narrow
+		}
+		
 		// Start from lastMoveCol, move out. Winning combo must contain center
 		int consecPieces = 1;
 		
@@ -133,15 +138,53 @@ public class Board {
 	}
 
 	/**
-	 * A right diagonal is one that goes bottom-left to top-right
-	 * @return
+	 * A right diagonal is one that goes bottom-left to top-right "forward slash"
+	 * @return Whether or not a win is satisfied along this direction
 	 */
 	private boolean checkR_Diag() {
 		// best way would be to go down-left until there isn't a match, then
 		// hold that count and proceed to check up-right until a win is
 		// no longer possible
-		
-		
+
+		// basically the same thing as checkHoriz but diagonally
+
+		// This is to not run off the board. How many spaces available 
+		int start = Math.min(lastMoveRow, lastMoveCol);
+		start = Math.min(start, (NUM_IN_ROW - 1));
+
+		int end = Math.min(HEIGHT - lastMoveCol, WIDTH - lastMoveRow);
+		end = Math.min(end, (NUM_IN_ROW - 1));
+
+		// Start from most recent move, move out. Winning combo must contain center
+		int consecPieces = 1;
+
+		// go down-left
+		for (int i = 1; i <= start ;i++) {
+			if (board[lastMoveRow - i][lastMoveCol - i] == turn) {
+				consecPieces++;
+			} else {
+				break;
+			}
+		}
+
+		// a win occurred from the last move directly down-left
+		if (consecPieces == NUM_IN_ROW) {
+			return true;
+		}
+
+		// go up-right
+		for (int i = 1; i <= end; i++) {
+			if (board[lastMoveRow + i][lastMoveCol + i] == turn) {
+				consecPieces++;
+			} else {
+				// return here because resetting at this point cannot yield a win
+				// this statement can be removed but exiting early saves some checks
+				return false;
+			}
+			if (consecPieces == NUM_IN_ROW) {
+				return true;
+			}
+		}
 		
 		return false;
 	}
